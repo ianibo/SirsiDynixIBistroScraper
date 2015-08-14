@@ -25,10 +25,38 @@
 import scraperwiki
 import lxml.html
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait 
+from selenium.webdriver.support import expected_conditions
 
 driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
 driver.set_window_size(1024, 768) # optional
 driver.get('http://library.sheffield.gov.uk/uhtbin/webcat')
 driver.save_screenshot('screen_0001.png') # save a screenshot to disk
 # sbtn = driver.find_element_by_css_selector('button.gbqfba')
+# Good selenium docs here:: http://selenium-python.readthedocs.org/en/latest/locating-elements.html
+searchFieldCombo = Select(driver.find_element_by_name('srchfield1'))
+searchFieldCombo.select_by_value('TI^TITLE^SERIES^Title Processing^title')
+searchInput = driver.find_element_by_name('searchdata1')
+searchInput.send_keys('a$')
+searchInput.send_keys(Keys.ENTER)
+WebDriverWait(driver, 30).until(
+        expected_conditions.presence_of_element_located((By.ID, "VIEW1"))
+)
+driver.save_screenshot('screen_0002.png') # save a screenshot to disk
+
+view_record_1_button = driver.find_element_by_name('VIEW^1')
+view_record_1_button.click()
+
+WebDriverWait(driver, 30).until(
+        expected_conditions.presence_of_element_located((By.ID, "hiddenlpsubmitdiv"))
+)
+
+driver.save_screenshot('screen_0003.png') # save a screenshot to disk
+
+# inputElement.send_keys('1')
+# inputElement.send_keys(Keys.ENTER)
+# inputElement.submit() 
 # sbtn.click()
