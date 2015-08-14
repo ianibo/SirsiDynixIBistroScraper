@@ -7,4 +7,9 @@ apt-get install phantomjs
 virtualenv --system-site-packages oaf
 source oaf/bin/activate
 pip install -r requirements.txt
-~                                           
+
+
+Run the dev version with 
+
+python scraper.py
+
