@@ -22,3 +22,13 @@
 # All that matters is that your final data is written to an SQLite database
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
+import scraperwiki
+import lxml.html
+from selenium import webdriver
+
+driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
+driver.set_window_size(1024, 768) # optional
+driver.get('http://library.sheffield.gov.uk/uhtbin/webcat')
+driver.save_screenshot('screen_0001.png') # save a screenshot to disk
+# sbtn = driver.find_element_by_css_selector('button.gbqfba')
+# sbtn.click()
