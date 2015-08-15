@@ -34,10 +34,11 @@ import sys, traceback, logging, shutil, platform
 
 dump_ghostdriver_log = False;
 
+# This might be relevant https://groups.google.com/forum/#!msg/phantomjs/uKTIEYenw78/to4rWFJ8sDgJ
 def wait_for_details_page(driver):
   print 'Waiting for details page'
   # Wait for the details page to finish loading
-  WebDriverWait(driver, 120).until(
+  WebDriverWait(driver, 30).until(
     expected_conditions.presence_of_element_located((By.NAME, "form_type"))
   )
   print 'Got full details page'
@@ -109,6 +110,7 @@ def scrape_ibistro() :
     print "platform %s" % platform.system()
 
     # driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
+    # driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG", "--load-images=false"]) # or add to your PATH
     driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
     driver.set_window_size(1024, 768) # optional
 
