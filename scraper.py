@@ -30,9 +30,12 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions
+import platform
+
+print "platform %s" % platform.system() 
 
 # driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
-driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64') # or add to your PATH
+driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
 driver.set_window_size(1024, 768) # optional
 
 # The plan is to use this
@@ -42,6 +45,8 @@ driver.set_window_size(1024, 768) # optional
 # We'll do the following for each ord - in testing just the a$s  [$ is a wildcard!]
 # Good selenium docs here:: http://selenium-python.readthedocs.org/en/latest/locating-elements.html
 
+# Whack up the debug to see if we can figure out why this throws a Bad Status Line exception when running remotely
+# driver.set_debuglevel(1)
 # Get the front page
 driver.get('http://library.sheffield.gov.uk/uhtbin/webcat')
 
