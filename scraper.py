@@ -99,3 +99,8 @@ driver.save_screenshot('screen_0003.png') # save a screenshot to disk
 # inputElement.send_keys(Keys.ENTER)
 # inputElement.submit() 
 # sbtn.click()
+
+
+
+# Extra notes
+# https://realpython.com/blog/python/headless-selenium-testing-with-python-and-phantomjs/
