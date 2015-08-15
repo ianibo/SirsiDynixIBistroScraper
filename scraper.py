@@ -31,9 +31,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions
 
-# driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
+driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
 # driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64') # or add to your PATH
-driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_32') # or add to your PATH
 driver.set_window_size(1024, 768) # optional
 
 # The plan is to use this
@@ -45,6 +44,8 @@ driver.set_window_size(1024, 768) # optional
 
 # Get the front page
 driver.get('http://library.sheffield.gov.uk/uhtbin/webcat')
+
+print 'starting'
 
 # Save screenshot for debug
 driver.save_screenshot('screen_0001.png') # save a screenshot to disk
