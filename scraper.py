@@ -42,7 +42,9 @@ def wait_for_details_page(driver):
   WebDriverWait(driver, 60).until(
     # Looks like presence of is our problem!
     # expected_conditions.presence_of_element_located((By.NAME, "form_type"))
-    expected_conditions.visibility_of_element_located((By.CLASS_NAME, "bibinfo"))
+    # expected_conditions.visibility_of_element_located((By.CLASS_NAME, "bibinfo"))
+    # Attempt 3 - lets say the page is loaded when the VOPTIONS link is visible
+    expected_conditions.visibility_of_element_located((By.NAME, "VOPTIONS"))
   )
   print 'Got full details page'
   return
