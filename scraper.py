@@ -61,6 +61,8 @@ searchInput.send_keys('a$')
 # Send enter to cause the search to execute
 searchInput.send_keys(Keys.ENTER)
 
+print 'Waiting for first item in results page to appear'
+
 # Wait for the search results page to finish loading
 WebDriverWait(driver, 30).until(
         expected_conditions.presence_of_element_located((By.ID, "VIEW1"))
@@ -69,10 +71,14 @@ WebDriverWait(driver, 30).until(
 # Debugging
 driver.save_screenshot('screen_0002.png') # save a screenshot to disk
 
+print 'Clicking button with name VIEW^1'
+
 # Now click the details button for search result 1
 view_record_1_button = driver.find_element_by_name('VIEW^1')
 view_record_1_button.click()
 # Currently blows up here due to problem with phantomjs 1.9.0
+
+print 'Waiting for details page to finish loading'
 
 # Wait for the details page to finish loading
 WebDriverWait(driver, 30).until(
