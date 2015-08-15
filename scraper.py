@@ -32,9 +32,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 import sys, traceback, logging, shutil, platform
 
-dump_ghostdriver_log = False;
+dev_mode = False;
 
 # This might be relevant https://groups.google.com/forum/#!msg/phantomjs/uKTIEYenw78/to4rWFJ8sDgJ
+# This seems to suggest some kind of timeout issue : https://github.com/burnash/gspread/issues/157#issuecomment-53970265
 def wait_for_details_page(driver):
   print 'Waiting for details page'
   # Wait for the details page to finish loading
@@ -59,7 +60,8 @@ def select_full_holidings_and_marc_tags(driver):
   unformatted_option.select_by_value('Y');
   view_option =  Select(driver.find_element_by_name('vopt_elst'))
   view_option.select_by_value('ALL');
-  driver.save_screenshot('screen_0004.png')
+  if dev_mode :
+    driver.save_screenshot('screen_0004.png')
   ok_button = driver.find_element_by_name('SCROLL^S');
   ok_button.click();
   wait_for_details_page(driver);
@@ -129,7 +131,8 @@ def scrape_ibistro() :
     print 'starting'
 
     # Save screenshot for debug
-    driver.save_screenshot('screen_0001.png') # save a screenshot to disk
+    if dev_mode :
+      driver.save_screenshot('screen_0001.png') # save a screenshot to disk
 
     # Find the search field combo
     searchFieldCombo = Select(driver.find_element_by_name('srchfield1'))
@@ -150,7 +153,8 @@ def scrape_ibistro() :
     )
 
     # Debugging
-    driver.save_screenshot('screen_0002.png') # save a screenshot to disk
+    if dev_mode:
+      driver.save_screenshot('screen_0002.png') # save a screenshot to disk
 
     print 'Clicking button with name VIEW^1'
 
@@ -166,11 +170,13 @@ def scrape_ibistro() :
 
     print 'got form_type input control.. good to continue'
 
-    driver.save_screenshot('screen_0003.png') # save a screenshot to disk
+    if dev_mode:
+      driver.save_screenshot('screen_0003.png') # save a screenshot to disk
 
     select_full_holidings_and_marc_tags(driver)
 
-    driver.save_screenshot('screen_0005.png') # save a screenshot to disk
+    if dev_mode:
+      driver.save_screenshot('screen_0005.png') # save a screenshot to disk
 
     scrape_resource_page(driver)
 
@@ -183,7 +189,7 @@ def scrape_ibistro() :
     traceback.print_tb(exc_traceback)
 
   # Eek this is __dirty__ - copy the ghostdriver.log to stdout so it appears on the morph.io screen for easy [easier] debugging
-  if dump_ghostdriver_log is True:
+  if dev_mode is True:
     with open("ghostdriver.log", "r") as f:
       shutil.copyfileobj(f, sys.stdout)
 
