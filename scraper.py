@@ -40,7 +40,7 @@ def wait_for_details_page(driver):
   print 'Waiting for details page'
   # Wait for the details page to finish loading
   WebDriverWait(driver, 30).until(
-    expected_conditions.presence_of_element_located((By.NAME, "form_type"))
+    expected_conditions.visibility_of_element_located((By.NAME, "form_type"))
   )
   print 'Got full details page'
   return
@@ -53,7 +53,7 @@ def select_full_holidings_and_marc_tags(driver):
 
   # Wait for options page to display
   WebDriverWait(driver, 30).until(
-    expected_conditions.presence_of_element_located((By.NAME, "SCROLL^S"))
+    expected_conditions.visibility_of_element_located((By.NAME, "SCROLL^S"))
   )
 
   unformatted_option =  Select(driver.find_element_by_name('vopt_unformatted'))
@@ -149,7 +149,7 @@ def scrape_ibistro() :
 
     # Wait for the search results page to finish loading
     WebDriverWait(driver, 30).until(
-            expected_conditions.presence_of_element_located((By.ID, "VIEW1"))
+            expected_conditions.visibility_of_element_located((By.ID, "VIEW1"))
     )
 
     # Debugging
