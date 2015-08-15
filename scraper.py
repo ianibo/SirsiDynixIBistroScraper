@@ -31,10 +31,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions
 
-driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
+# driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
+driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64') # or add to your PATH
 driver.set_window_size(1024, 768) # optional
-
-
 
 # The plan is to use this
 # for i in range(ord('a'), ord('n')+1):
@@ -74,9 +73,10 @@ view_record_1_button.click()
 # Currently blows up here due to problem with phantomjs 1.9.0
 
 # Wait for the details page to finish loading
-WebDriverWait(driver, 30).until(
-        expected_conditions.presence_of_element_located((By.ID, "hiddenlpsubmitdiv"))
-)
+#WebDriverWait(driver, 30).until(
+#        expected_conditions.presence_of_element_located((By.ID, "hiddenlpsubmitdiv"))
+#)
+
 
 driver.save_screenshot('screen_0003.png') # save a screenshot to disk
 
