@@ -31,6 +31,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions
 import platform
+import shutil
+import sys
 
 print "platform %s" % platform.system() 
 
@@ -100,6 +102,9 @@ driver.save_screenshot('screen_0003.png') # save a screenshot to disk
 # inputElement.submit() 
 # sbtn.click()
 
+# Eek this is __dirty__ - copy the ghostdriver.log to stdout so it appears on the morph.io screen for easy [easier] debugging
+with open("ghostdriver.log", "r") as f:
+    shutil.copyfileobj(f, sys.stdout)
 
 
 # Extra notes
