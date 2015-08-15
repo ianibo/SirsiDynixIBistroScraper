@@ -40,7 +40,7 @@ def wait_for_details_page(driver):
   print 'Waiting for details page'
   # Wait for the details page to finish loading
   WebDriverWait(driver, 30).until(
-    expected_conditions.visibility_of_element_located((By.NAME, "form_type"))
+    expected_conditions.presence_of_element_located((By.NAME, "form_type"))
   )
   print 'Got full details page'
   return
