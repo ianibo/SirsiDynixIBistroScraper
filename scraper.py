@@ -32,7 +32,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 # driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
-driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64') # or add to your PATH
+# driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64') # or add to your PATH
+driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_32') # or add to your PATH
 driver.set_window_size(1024, 768) # optional
 
 # The plan is to use this
