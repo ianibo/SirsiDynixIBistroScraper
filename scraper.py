@@ -37,7 +37,7 @@ dump_ghostdriver_log = False;
 def wait_for_details_page(driver):
   print 'Waiting for details page'
   # Wait for the details page to finish loading
-  WebDriverWait(driver, 60).until(
+  WebDriverWait(driver, 120).until(
     expected_conditions.presence_of_element_located((By.NAME, "form_type"))
   )
   print 'Got full details page'
