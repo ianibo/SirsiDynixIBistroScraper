@@ -184,7 +184,9 @@ def scrape_a_letter(browser,letter) :
   # find the search input text control
   # Send the query a$ [Or the ord above]
   browser.select("match_on", "PARTIAL")
-  browser.fill("searchdata3", letter+"$")
+  # match_on partial adds the wildcard for us [And never tells us] and terminates the string at that point *bangs head*
+  # browser.fill("searchdata3", letter+"$")
+  browser.fill("searchdata3", letter)
   # Send enter to cause the search to execute
   button = browser.find_by_xpath(
     '//input[@class="searchbutton" and @value="Search"]'
@@ -194,7 +196,7 @@ def scrape_a_letter(browser,letter) :
   print 'Waiting for first item in results page to appear'
 
   # Wait for the search results page to finish loading
-  if not browser.is_element_present_by_id('VIEW1', wait_time=30):
+  if not browser.is_element_present_by_id('VIEW1', wait_time=60):
     raise Exception('Failed to find VIEW1')
 
   # Debugging
@@ -209,7 +211,7 @@ def scrape_a_letter(browser,letter) :
   print 'Waiting for details page to finish loading'
 
   # Wait for the details page to finish loading
-  if browser.is_element_present_by_name('VOPTIONS', wait_time=15):
+  if browser.is_element_present_by_name('VOPTIONS', wait_time=60):
     print 'Got full details page'
 
   print 'got form_type input control.. good to continue'
@@ -224,7 +226,7 @@ def scrape_a_letter(browser,letter) :
 
   data = scrape_resource_page(browser)
 
-  while browser.is_element_present_by_name('SCROLL^F', wait_time=15):
+  while browser.is_element_present_by_name('SCROLL^F', wait_time=60):
     if data is not None :
       scraperwiki.sqlite.save(unique_keys=['hashCode'], data=data)
       print 'Processing data = ', data
@@ -232,9 +234,12 @@ def scrape_a_letter(browser,letter) :
     else :
       print("** NO DATA **");
 
+  
     next_link = browser.find_by_name('SCROLL^F');
     next_link.click()
     data = scrape_resource_page(browser)
+
+  print("Looks like we reached the end of the next page links...");
 
   return
 
