@@ -128,8 +128,8 @@ def scrape_ibistro() :
 
     # driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
     # driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG", "--load-images=false"]) # or add to your PATH
-    # driver = webdriver.PhantomJS('./phantomjs_2_0_0_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
-    driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
+    driver = webdriver.PhantomJS('./phantomjs_2_0_0_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
+    # driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
     driver.set_window_size(1024, 768) # optional
 
     # The plan is to use this
