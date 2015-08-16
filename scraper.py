@@ -83,7 +83,9 @@ def scrape_catalog_info(browser, resource_properties):
 
     if action is not None :
         print 'Processing', marc_tag.text, 'as ', action['targetColumn'], 'Set to', v
-        resource_properties[action['targetColumn']] = v
+        # iBistro says it's sending us UTF8 in the header, but then nicely passes windows-1252. Attempt to work
+        # around by calling decode.
+        resource_properties[action['targetColumn']] = v.decode('windows-1252','replace')
 
   return
 
@@ -135,15 +137,13 @@ def scrape_ibistro() :
 
         print 'starting'
 
-        # Save screenshot for debug
-        if dev_mode :
-            browser.screenshot('screen_0001.png') # save a screenshot to disk
-
-        # Find the search field combo
-        # Say we want to search by title
-        browser.select("srchfield1", "TI^TITLE^SERIES^Title Processing^title")
+        print "Looking for power search button"
+        power_search_button = browser.find_by_xpath('//a[contains(text(),"Power Search")]').first
+        power_search_button.click()
 
         scrape_a_letter(browser, 'a')
+        # else :
+        #  print "Unable to get to power search for left anchored phrase search"
 
   except:
     print "Unexpected error:", sys.exc_info()
@@ -164,7 +164,8 @@ def scrape_ibistro() :
 def scrape_a_letter(browser,letter) :
   # find the search input text control
   # Send the query a$ [Or the ord above]
-  browser.fill("searchdata1", letter+"$")
+  browser.select("match_on", "PARTIAL")
+  browser.fill("searchdata3", letter+"$")
   # Send enter to cause the search to execute
   button = browser.find_by_xpath(
     '//input[@class="searchbutton" and @value="Search"]'
