@@ -21,6 +21,7 @@ import hashlib
 import re
 from splinter import Browser
 import sys, traceback, logging, shutil, platform
+from string import ascii_lowercase
 
 dev_mode = False;
 
@@ -141,28 +142,14 @@ def scrape_ibistro() :
 
     with Browser('phantomjs') as browser:
 
-        # The plan is to use this
-        # for i in range(ord('a'), ord('n')+1):
-        #    print chr(i),
-        # To submit a query for every letter and number then iterate the results, indexing by a hash of the identifers [to cope with dups]
-        # We'll do the following for each ord - in testing just the a$s  [$ is a wildcard!]
-        # Good selenium docs here:: http://selenium-python.readthedocs.org/en/latest/locating-elements.html
-
-        # Whack up the debug to see if we can figure out why this throws a Bad Status Line exception when running remotely
-        # driver.set_debuglevel(1)
-        # Get the front page
-        print 'Get front page'
-        browser.visit('http://library.sheffield.gov.uk/uhtbin/webcat')
-
-        print 'starting'
-
-        print "Looking for power search button"
-        power_search_button = browser.find_by_xpath('//a[contains(text(),"Power Search")]').first
-        power_search_button.click()
-
-        scrape_a_letter(browser, 'a')
-        # else :
-        #  print "Unable to get to power search for left anchored phrase search"
+      for a in ascii_lowercase :
+        scrape_a_letter(browser,''+a)
+        for b in ascii_lowercase :
+          scrape_a_letter(browser,''+a+b)
+          for c in ascii_lowercase :
+            scrape_a_letter(browser,''+a+b+c)
+            for d in ascii_lowercase :
+              scrape_a_letter(browser,''+a+b+c+d)
 
   except:
     print "Unexpected error:", sys.exc_info()
@@ -181,11 +168,18 @@ def scrape_ibistro() :
 
 
 def scrape_a_letter(browser,letter) :
-  # find the search input text control
-  # Send the query a$ [Or the ord above]
+  print 'scraping', letter
+
+  browser.visit('http://library.sheffield.gov.uk/uhtbin/webcat')
+
+  print 'starting'
+
+  print "Looking for power search button"
+  power_search_button = browser.find_by_xpath('//a[contains(text(),"Power Search")]').first
+  power_search_button.click()
+
   browser.select("match_on", "PARTIAL")
   # match_on partial adds the wildcard for us [And never tells us] and terminates the string at that point *bangs head*
-  # browser.fill("searchdata3", letter+"$")
   browser.fill("searchdata3", letter)
   # Send enter to cause the search to execute
   button = browser.find_by_xpath(
