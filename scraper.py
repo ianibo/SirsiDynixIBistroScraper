@@ -1,16 +1,6 @@
 # This is a template for a Python scraper on morph.io (https://morph.io)
 # including some code snippets below that you should find helpful
 
-# import scraperwiki
-# import lxml.html
-#
-# # Read in a page
-# html = scraperwiki.scrape("http://foo.com")
-#
-# # Find something on the page using css selectors
-# root = lxml.html.fromstring(html)
-# root.cssselect("div[align='left']")
-#
 # # Write out to the sqlite database using scraperwiki library
 # scraperwiki.sqlite.save(unique_keys=['name'], data={"name": "susan", "occupation": "software developer"})
 #
@@ -24,10 +14,18 @@
 # called "data".
 import scraperwiki
 import lxml.html
+import hashlib
 from splinter import Browser
 import sys, traceback, logging, shutil, platform
 
 dev_mode = False;
+
+marc_extract_rules = {
+  '245' : { 
+    'targetColumn' : 'Title',
+    'allowRepeated' : False
+  }
+}
 
 
 def select_full_holidings_and_marc_tags(browser):
@@ -49,13 +47,13 @@ def select_full_holidings_and_marc_tags(browser):
   print 'done'
   return
 
-def scrape_item_info(browser):
+def scrape_item_info(browser, resource_properties):
   print 'Getting item info'
   # bibinfo_div = driver.find_element_by_name('bibinfo') - It's class not name
   # title = bibinfo_div.find_element_by
   return
 
-def scrape_catalog_info(browser):
+def scrape_catalog_info(browser, resource_properties):
   print 'Getting catalog info'
 
   browser.find_by_id('tab3').first.click()
@@ -69,25 +67,41 @@ def scrape_catalog_info(browser):
   trs = raw_data_table.find_by_tag("tr")
   for row in trs:
     marc_tag = row.find_by_xpath("./th")
-    # print "procesing tag %s" % marc_tag.text()
     indicators = row.find_by_xpath("./td[1]")
     tag_content = row.find_by_xpath("./td[2]")
-    print 'Handling content %s' % tag_content.text
+    # print 'Handling content %s' % tag_content.text
     inner_anchor = tag_content.find_by_xpath("./a")
     v = None
     if len(inner_anchor) == 1 :
-      value = inner_anchor[0].text
+      v = inner_anchor[0].text
     else:
       v = tag_content.text
 
-    print "Got tag %s indicators %s value %s" % ( marc_tag.text, indicators.text, v )
+    # print "Got tag %s indicators %s value %s" % ( marc_tag.text, indicators.text, v )
+
+    action = marc_extract_rules.get(marc_tag.text)
+
+    if action is not None :
+        print 'Processing', marc_tag.text, 'as ', action['targetColumn'], 'Set to', v
+        resource_properties[action['targetColumn']] = v
+
   return
 
 def scrape_resource_page(browser) :
   print 'scraping a resource'
-  scrape_item_info(browser)
-  scrape_catalog_info(browser)
-  return
+  resource_properties = {}
+  scrape_item_info(browser, resource_properties)
+  scrape_catalog_info(browser, resource_properties)
+
+  # Make a key from the title [And some other fields to make the md5 unique]
+  if resource_properties.get('Title') is not None :
+      m = hashlib.md5()
+      m.update(resource_properties.get('Title'))
+      resource_properties['hashCode'] = m.hexdigest()
+  else :
+      print 'Non title - cant md5 it'
+
+  return resource_properties
 
 def report_module(name):
   inf = sys.modules[name]
@@ -129,57 +143,7 @@ def scrape_ibistro() :
         # Say we want to search by title
         browser.select("srchfield1", "TI^TITLE^SERIES^Title Processing^title")
 
-        # find the search input text control
-        # Send the query a$ [Or the ord above]
-        browser.fill("searchdata1", "a$")
-        # Send enter to cause the search to execute
-        button = browser.find_by_xpath(
-            '//input[@class="searchbutton" and @value="Search"]'
-        ).first
-        button.click()
-
-        print 'Waiting for first item in results page to appear'
-
-        # Wait for the search results page to finish loading
-        if not browser.is_element_present_by_id('VIEW1', wait_time=30):
-            raise Exception('Failed to find VIEW1')
-
-        # Debugging
-        if dev_mode:
-            browser.save_screenshot('screen_0002.png') # save a screenshot to disk
-
-        print 'Clicking button with name VIEW^1'
-
-        # Now click the details button for search result 1
-        browser.find_by_name('VIEW^1').first.click()
-        # Currently blows up here due to problem with phantomjs 1.9.0
-
-        print 'Waiting for details page to finish loading'
-
-        # Wait for the details page to finish loading
-        if browser.is_element_present_by_name('VOPTIONS', wait_time=15):
-            print 'Got full details page'
-
-        print 'got form_type input control.. good to continue'
-
-        if dev_mode:
-            browser.save_screenshot('screen_0003.png') # save a screenshot to disk
-
-        select_full_holidings_and_marc_tags(browser)
-
-        if dev_mode:
-            browser.save_screenshot('screen_0005.png') # save a screenshot to disk
-
-        scrape_resource_page(browser)
-
-        while browser.is_element_present_by_name('SCROLL^F', wait_time=15):
-            print 'Moving to next record'
-            next_link = browser.find_by_name('SCROLL^F');
-            next_link.click()
-            scrape_resource_page(browser)
-            
-
-
+        scrape_a_letter(browser, 'a')
 
   except:
     print "Unexpected error:", sys.exc_info()
@@ -193,9 +157,65 @@ def scrape_ibistro() :
     with open("ghostdriver.log", "r") as f:
       shutil.copyfileobj(f, sys.stdout)
 
+  return
 
-  # Extra notes
-  # https://realpython.com/blog/python/headless-selenium-testing-with-python-and-phantomjs/
+
+
+def scrape_a_letter(browser,letter) :
+  # find the search input text control
+  # Send the query a$ [Or the ord above]
+  browser.fill("searchdata1", letter+"$")
+  # Send enter to cause the search to execute
+  button = browser.find_by_xpath(
+    '//input[@class="searchbutton" and @value="Search"]'
+  ).first
+  button.click()
+
+  print 'Waiting for first item in results page to appear'
+
+  # Wait for the search results page to finish loading
+  if not browser.is_element_present_by_id('VIEW1', wait_time=30):
+    raise Exception('Failed to find VIEW1')
+
+  # Debugging
+  if dev_mode:
+    browser.save_screenshot('screen_0002.png') # save a screenshot to disk
+
+  print 'Clicking button with name VIEW^1'
+
+  # Now click the details button for search result 1
+  browser.find_by_name('VIEW^1').first.click()
+
+  print 'Waiting for details page to finish loading'
+
+  # Wait for the details page to finish loading
+  if browser.is_element_present_by_name('VOPTIONS', wait_time=15):
+    print 'Got full details page'
+
+  print 'got form_type input control.. good to continue'
+
+  if dev_mode:
+    browser.save_screenshot('screen_0003.png') # save a screenshot to disk
+
+  select_full_holidings_and_marc_tags(browser)
+
+  if dev_mode:
+    browser.save_screenshot('screen_0005.png') # save a screenshot to disk
+
+  data = scrape_resource_page(browser)
+
+  while browser.is_element_present_by_name('SCROLL^F', wait_time=15):
+    if data is not None :
+      scraperwiki.sqlite.save(unique_keys=['hashCode'], data=data)
+      print 'Processing data = ', data
+      print 'Moving to next record'
+    else :
+      print("** NO DATA **");
+
+    next_link = browser.find_by_name('SCROLL^F');
+    next_link.click()
+    data = scrape_resource_page(browser)
+
   return
 
 print 'DoIt'
