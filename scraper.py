@@ -146,7 +146,7 @@ def scrape_ibistro() :
 
         # Debugging
         if dev_mode:
-            driver.save_screenshot('screen_0002.png') # save a screenshot to disk
+            browser.save_screenshot('screen_0002.png') # save a screenshot to disk
 
         print 'Clicking button with name VIEW^1'
 
@@ -163,14 +163,23 @@ def scrape_ibistro() :
         print 'got form_type input control.. good to continue'
 
         if dev_mode:
-            driver.save_screenshot('screen_0003.png') # save a screenshot to disk
+            browser.save_screenshot('screen_0003.png') # save a screenshot to disk
 
         select_full_holidings_and_marc_tags(browser)
 
         if dev_mode:
-            driver.save_screenshot('screen_0005.png') # save a screenshot to disk
+            browser.save_screenshot('screen_0005.png') # save a screenshot to disk
 
         scrape_resource_page(browser)
+
+        while browser.is_element_present_by_name('SCROLL^F', wait_time=15):
+            print 'Moving to next record'
+            next_link = browser.find_by_name('SCROLL^F');
+            next_link.click()
+            scrape_resource_page(browser)
+            
+
+
 
   except:
     print "Unexpected error:", sys.exc_info()
