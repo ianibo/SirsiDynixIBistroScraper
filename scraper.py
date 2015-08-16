@@ -12,13 +12,22 @@
 # All that matters is that your final data is written to an SQLite database
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
+
+# for other data https://classic.scraperwiki.com/docs/python/python_datastore_guide/
+
 import scraperwiki
 import lxml.html
 import hashlib
+import re
 from splinter import Browser
 import sys, traceback, logging, shutil, platform
 
 dev_mode = False;
+
+# This us used to create a version of the tag content with the awful pipe subfield indicator substitution stripped out
+subfield_indicator_regex = re.compile(ur"\|.",re.UNICODE)
+# subfield_indicator_regex = re.compile(r"(\\|b)")
+# print 'testing regex', subfield_indicator_regex.sub('XXX','a |b c |s d |d')
 
 marc_extract_rules = {
   '245' : { 
@@ -73,11 +82,18 @@ def scrape_catalog_info(browser, resource_properties):
     inner_anchor = tag_content.find_by_xpath("./a")
     v = None
     if len(inner_anchor) == 1 :
+      # v = inner_anchor[0].text.decode('windows-1252','replace')
+      # v = unicode(inner_anchor[0].text, 'windows-1252', 'ignore')
       v = inner_anchor[0].text
     else:
       v = tag_content.text
 
-    # print "Got tag %s indicators %s value %s" % ( marc_tag.text, indicators.text, v )
+
+    # decoded_v = unicode(v,'latin-1')
+    decoded_v = v
+
+    # print "Got tag %s indicators %s value %s" % ( marc_tag.text, indicators.text, decoded_v )
+
 
     action = marc_extract_rules.get(marc_tag.text)
 
@@ -85,7 +101,9 @@ def scrape_catalog_info(browser, resource_properties):
         print 'Processing', marc_tag.text, 'as ', action['targetColumn'], 'Set to', v
         # iBistro says it's sending us UTF8 in the header, but then nicely passes windows-1252. Attempt to work
         # around by calling decode.
-        resource_properties[action['targetColumn']] = v.decode('windows-1252','replace')
+        print 'replacing', decoded_v
+        resource_properties[action['targetColumn']] = subfield_indicator_regex.sub('',decoded_v);
+        print 'replacing', resource_properties.get(action['targetColumn'])
 
   return
 
@@ -98,7 +116,8 @@ def scrape_resource_page(browser) :
   # Make a key from the title [And some other fields to make the md5 unique]
   if resource_properties.get('Title') is not None :
       m = hashlib.md5()
-      m.update(resource_properties.get('Title'))
+      # This only works on ascii characters - 
+      m.update(resource_properties.get('Title').encode('ascii','ignore'))
       resource_properties['hashCode'] = m.hexdigest()
   else :
       print 'Non title - cant md5 it'
