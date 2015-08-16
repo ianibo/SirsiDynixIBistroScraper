@@ -98,7 +98,7 @@ def scrape_catalog_info(browser, resource_properties):
     action = marc_extract_rules.get(marc_tag.text)
 
     if action is not None :
-        print 'Processing', marc_tag.text, 'as ', action['targetColumn'], 'Set to', v
+        # print 'Processing', marc_tag.text, 'as ', action['targetColumn'], 'Set to', decoded_v
         # iBistro says it's sending us UTF8 in the header, but then nicely passes windows-1252. Attempt to work
         # around by calling decode.
         print 'replacing', decoded_v
