@@ -142,6 +142,7 @@ def scrape_ibistro() :
     # Whack up the debug to see if we can figure out why this throws a Bad Status Line exception when running remotely
     # driver.set_debuglevel(1)
     # Get the front page
+    print 'Get front page'
     driver.get('http://library.sheffield.gov.uk/uhtbin/webcat')
 
     print 'starting'
