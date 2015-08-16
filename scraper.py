@@ -25,6 +25,7 @@
 import scraperwiki
 import lxml.html
 from selenium import webdriver
+from selenium import selenium
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -39,7 +40,7 @@ dev_mode = False;
 def wait_for_details_page(driver):
   print 'Waiting for details page'
   # Wait for the details page to finish loading
-  WebDriverWait(driver, 300).until(
+  WebDriverWait(driver, 15).until(
     # Looks like presence of is our problem!
     # expected_conditions.presence_of_element_located((By.NAME, "form_type"))
     # expected_conditions.visibility_of_element_located((By.CLASS_NAME, "bibinfo"))
@@ -110,13 +111,24 @@ def scrape_resource_page(driver) :
   scrape_catalog_info(driver)
   return
 
+def report_module(name):
+  inf = sys.modules[name]
+  if hasattr( inf, '__version__' ):
+    print name, inf.__version__
+  else:
+    print "No version info for ", name
+
 
 def scrape_ibistro() :
   try:
     print "platform %s" % platform.system()
+    print "Python ", sys.version_info
+    report_module('selenium');
+    report_module('scraperwiki');
 
     # driver = webdriver.PhantomJS('phantomjs') # or add to your PATH
     # driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG", "--load-images=false"]) # or add to your PATH
+    # driver = webdriver.PhantomJS('./phantomjs_2_0_0_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
     driver = webdriver.PhantomJS('./phantomjs_1_9_2_linux_64', service_args=["--webdriver-loglevel=DEBUG"]) # or add to your PATH
     driver.set_window_size(1024, 768) # optional
 
