@@ -102,9 +102,7 @@ def scrape_catalog_info(browser, resource_properties):
         # print 'Processing', marc_tag.text, 'as ', action['targetColumn'], 'Set to', decoded_v
         # iBistro says it's sending us UTF8 in the header, but then nicely passes windows-1252. Attempt to work
         # around by calling decode.
-        print 'replacing', decoded_v
         resource_properties[action['targetColumn']] = subfield_indicator_regex.sub('',decoded_v);
-        print 'replacing', resource_properties.get(action['targetColumn'])
 
   return
 
