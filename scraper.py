@@ -218,18 +218,20 @@ def scrape_a_letter(browser,letter) :
 
   data = scrape_resource_page(browser)
 
-  while browser.is_element_present_by_name('SCROLL^F', wait_time=60):
-    if data is not None :
-      scraperwiki.sqlite.save(unique_keys=['hashCode'], data=data)
-      print 'Processing data = ', data
-      print 'Moving to next record'
-    else :
-      print("** NO DATA **");
-
+  try:
+    while browser.is_element_present_by_name('SCROLL^F', wait_time=60):
+      if data is not None :
+        scraperwiki.sqlite.save(unique_keys=['hashCode'], data=data)
+        print 'Processing data = ', data
+        print 'Moving to next record'
+      else :
+        print("** NO DATA **");
   
-    next_link = browser.find_by_name('SCROLL^F');
-    next_link.click()
-    data = scrape_resource_page(browser)
+      next_link = browser.find_by_name('SCROLL^F');
+      next_link.click()
+      data = scrape_resource_page(browser)
+  except:
+    print "Exception looking for NEXT - looks like we reached the end of the results - on to next nonce"
 
   print("Looks like we reached the end of the next page links...");
 
