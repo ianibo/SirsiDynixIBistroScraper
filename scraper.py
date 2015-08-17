@@ -148,6 +148,7 @@ def scrape_ibistro() :
             scrape_a_letter(browser,''+a+b+c)
             for d in ascii_lowercase :
               scrape_a_letter(browser,''+a+b+c+d)
+              scraperwiki.sqlite.save_var('completed_prefix', ''+a+b+c+d)           
 
   except:
     print "Unexpected error:", sys.exc_info()
@@ -187,51 +188,55 @@ def scrape_a_letter(browser,letter) :
 
   print 'Waiting for first item in results page to appear'
 
-  # Wait for the search results page to finish loading
-  if not browser.is_element_present_by_id('VIEW1', wait_time=60):
-    raise Exception('Failed to find VIEW1')
+  try :
+    # Wait for the search results page to finish loading
+    if not browser.is_element_present_by_id('VIEW1', wait_time=100):
+      raise Exception('Failed to find VIEW1')
 
-  # Debugging
-  if dev_mode:
-    browser.save_screenshot('screen_0002.png') # save a screenshot to disk
+    # Debugging
+    if dev_mode:
+      browser.save_screenshot('screen_0002.png') # save a screenshot to disk
 
-  print 'Clicking button with name VIEW^1'
+    print 'Clicking button with name VIEW^1'
 
-  # Now click the details button for search result 1
-  browser.find_by_name('VIEW^1').first.click()
+    # Now click the details button for search result 1
+    browser.find_by_name('VIEW^1').first.click()
 
-  print 'Waiting for details page to finish loading'
+    print 'Waiting for details page to finish loading'
 
-  # Wait for the details page to finish loading
-  if browser.is_element_present_by_name('VOPTIONS', wait_time=60):
-    print 'Got full details page'
+    # Wait for the details page to finish loading
+    if browser.is_element_present_by_name('VOPTIONS', wait_time=60):
+      print 'Got full details page'
 
-  print 'got form_type input control.. good to continue'
+    print 'got form_type input control.. good to continue'
 
-  if dev_mode:
-    browser.save_screenshot('screen_0003.png') # save a screenshot to disk
+    if dev_mode:
+      browser.save_screenshot('screen_0003.png') # save a screenshot to disk
 
-  select_full_holidings_and_marc_tags(browser)
+    select_full_holidings_and_marc_tags(browser)
 
-  if dev_mode:
-    browser.save_screenshot('screen_0005.png') # save a screenshot to disk
+    if dev_mode:
+      browser.save_screenshot('screen_0005.png') # save a screenshot to disk
 
-  data = scrape_resource_page(browser)
+    data = scrape_resource_page(browser)
 
-  try:
-    while browser.is_element_present_by_name('SCROLL^F', wait_time=60):
-      if data is not None :
-        scraperwiki.sqlite.save(unique_keys=['hashCode'], data=data)
-        print 'Processing data = ', data
-        print 'Moving to next record'
-      else :
-        print("** NO DATA **");
+    try:
+      while browser.is_element_present_by_name('SCROLL^F', wait_time=60):
+        if data is not None :
+          scraperwiki.sqlite.save(unique_keys=['hashCode'], data=data)
+          print 'Processing data = ', data
+          print 'Moving to next record'
+        else :
+          print("** NO DATA **");
   
-      next_link = browser.find_by_name('SCROLL^F');
-      next_link.click()
-      data = scrape_resource_page(browser)
+        next_link = browser.find_by_name('SCROLL^F');
+        next_link.click()
+        data = scrape_resource_page(browser)
+    except:
+      print "Exception looking for NEXT - looks like we reached the end of the results - on to next nonce"
+
   except:
-    print "Exception looking for NEXT - looks like we reached the end of the results - on to next nonce"
+    print "Possible the search returned no results.. continue"
 
   print("Looks like we reached the end of the next page links...");
 
